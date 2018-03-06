@@ -22,8 +22,15 @@ export default {
   },
   created () {
     GeoServices.getCurrentPosition().then((position) => {
-      console.log('pos', position);
-      GeoServices.getLatLong(position);
+      GeoServices.getLatLong(position).then((place) => {
+        place.city = place.city.toLowerCase().split(' ').join('-');
+        place.country = place.country.toLowerCase().split(' ').join('-');
+        this.placeSelected(place);
+      }).catch(() => {
+        console.log('Google invert geolocation : silent fail');
+      });
+    }).catch(() => {
+      console.log('Geolocalisation unauthorized : silent fail');
     });
   },
   methods: {

@@ -6,31 +6,35 @@ export default class GeoServices {
           resolve(position);
         });
       } else {
-        resolve(null);
+        reject(new Error('fail'));
       }
     })
   }
   static getLatLong (position) {
-    const geocoder = new google.maps.Geocoder();
-    const latitude = position.coords.latitude;
-    const longitude = position.coords.longitude;
-    const latlng = new google.maps.LatLng(latitude, longitude);
-    geocoder.geocode({'latLng': latlng}, (results, status) => {
-      if (status === google.maps.GeocoderStatus.OK) {
-        if (results[0]) {
-          let components = results[0].address_components;
-          for (let component = 0; component < (components.length); component++) {
-            if (components[component].types[0] === 'country') {
-              let country = components[component].long_name;
-              console.log('country', country);
+    return new Promise((resolve, reject) => {
+      const latlng = new google.maps.LatLng(
+        position.coords.latitude,
+        position.coords.longitude
+      );
+      new google.maps.Geocoder().geocode({'latLng': latlng}, (results, status) => {
+        if (status === google.maps.GeocoderStatus.OK) {
+          if (results[0]) {
+            let components = results[0].address_components;
+            let country = null;
+            let city = null;
+            for (let component = 0; component < (components.length); component++) {
+              if (components[component].types[0] === 'country') {
+                country = components[component].long_name;
+              }
+              if (components[component].types[0] === 'administrative_area_level_1') {
+                city = components[component].long_name;
+              }
             }
-            if (components[component].types[0] === 'administrative_area_level_1') {
-              let city = components[component].long_name;
-              console.log('city', city);
-            }
+            if (country && city) resolve({country, city});
           }
         }
-      }
+        reject(new Error('fail'));
+      });
     });
   }
 }

@@ -24,7 +24,7 @@ export default {
   color: #2c3e50;
   background-color: rgb(245, 245, 245);
 }
-#core-wrapper{
+#core-wrapper {
   max-width: 1280px;
   margin-left: auto;
   margin-right: auto;
