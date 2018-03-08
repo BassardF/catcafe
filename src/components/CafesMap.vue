@@ -9,8 +9,13 @@ export default {
   name: 'CafesMap',
   props: {
     cafes: Array,
-    geo: Array,
+    geo: Object,
     expanded: String
+  },
+  mounted () {
+    if (this.cafes && this.cafes.length) {
+      this.drawMap(this.cafes);
+    }
   },
   watch: {
     expanded () {
@@ -25,6 +30,18 @@ export default {
       }
     },
     cafes (cafs) {
+      this.drawMap(cafs);
+    }
+  },
+  data () {
+    return {
+      map: null,
+      initialZoom: true,
+      markers: {}
+    }
+  },
+  methods: {
+    drawMap (cafs) {
       // Init the Map
       this.initialZoom = true;
       this.map = new google.maps.Map(document.getElementById('map'), {zoom: 10});
@@ -58,7 +75,7 @@ export default {
             infowindow.open(this.map, marker);
             // Add see more listener
             document.getElementById('see-more-' + cafs[i].key).addEventListener('click', () => {
-              this.showModal(cafs[i].key);
+              this.showDetails(cafs[i].key);
             });
           });
           this.markers[cafs[i].key] = marker;
@@ -68,18 +85,11 @@ export default {
       }
       // Resize bounds
       this.map.fitBounds(bounds);
-    }
-  },
-  data () {
-    return {
-      map: null,
-      initialZoom: true,
-      markers: {}
-    }
-  },
-  methods: {
-    showModal (key) {
-      this.$emit('modal', key)
+      // Bubble map
+      this.$emit('setmap', this.map)
+    },
+    showDetails (key) {
+      this.$emit('details', key)
     },
     closeMarkers () {
       for (let key in this.markers) {

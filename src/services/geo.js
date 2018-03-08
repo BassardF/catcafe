@@ -37,5 +37,38 @@ export default class GeoServices {
       });
     });
   }
+  static calculateDistance (pos1, pos2) {
+    if (pos1 && pos2 && pos1.lat && pos1.lng && pos2.lat && pos2.lng) {
+      const R = 6371e3;
+      const φ1 = pos1.lat * (Math.PI / 180);
+      const φ2 = pos2.lat * (Math.PI / 180);
+      const Δφ = (pos2.lat - pos1.lat) * (Math.PI / 180);
+      const Δλ = (pos2.lng - pos1.lng) * (Math.PI / 180);
+      const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+              Math.cos(φ1) * Math.cos(φ2) *
+              Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      return (R * c) / 1000;
+    }
+  }
+  static placeSearch (map, query) {
+    return new Promise((resolve, reject) => {
+      if (!map || !query) reject(new Error('Fail'));
+      const service = new google.maps.places.PlacesService(map);
+      service.textSearch({query}, (resp) => {
+        if (resp && resp[0]) resolve(resp[0]);
+        else reject(new Error('Fail'));
+      });
+    });
+  }
+  static detailedPlaceSearch (map, placeId) {
+    return new Promise((resolve, reject) => {
+      if (!map || !placeId) reject(new Error('Fail'));
+      const service = new google.maps.places.PlacesService(map);
+      service.getDetails({placeId}, (resp) => {
+        if (resp) resolve(resp);
+        else reject(new Error('Fail'));
+      });
+    });
+  }
 }
-// https://maps.googleapis.com/maps/api/geocode/json?latlng=-41.2942955,174.78012909999998&key=AIzaSyC7x3_BYxA4ukRN48ZixDXh9isTwr81fXk

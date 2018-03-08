@@ -8,8 +8,11 @@
 </template>
 
 <script>
-import Topbar from './components/Topbar'
+import Vue from 'vue';
+import VueCarousel from 'vue-carousel';
+import Topbar from './components/dumbs/Topbar'
 
+Vue.use(VueCarousel);
 export default {
   name: 'App',
   components: { Topbar }
