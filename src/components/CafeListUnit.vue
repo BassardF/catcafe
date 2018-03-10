@@ -1,14 +1,22 @@
 <template>
   <div v-on:click="select" class="cafe-list-unit" v-bind:class="{ 'selected-cafe-list-unit': expanded === cafe.key }">
-    <h2>{{ cafe.name }}</h2>
+
+    <div class="flex">
+      <div class="flex-1">
+        <h2 class="bold">{{ cafe.name }}</h2>
+      </div>
+      <div class="flex-1 text-align-right">
+        <h2 v-if="cafe.distance">
+          <i class="fas fa-location-arrow v-align-middle"
+             v-bind:style="{ marginRight: '3px' }"></i>
+          <span class="v-align-middle">{{ cafe.distance }}</span>
+        </h2>
+      </div>
+    </div>
     <div>{{ cafe.address }}</div>
-    <div>{{ distance }}</div>
     <div class="inner-info">
       <div>{{ cafe.phoneFormatted }}</div>
       <div>{{ cafe.email }}</div>
-      <div v-if="!!cafe.open">
-        from {{ cafe.open.hours[0] }} to {{ cafe.open.hours[1] }}
-      </div>
       <div class="flex">
         <div class="flex-1 blue">
           <i v-bind:style="{ marginRight: '3px' }"
@@ -33,31 +41,16 @@
 </template>
 
 <script>
-import GeoServices from '../services/geo'
-
 export default {
   name: 'CafeListUnit',
   props: {
     cafe: Object,
     expanded: String,
-    geo: Object,
     detailed: Boolean
   },
   data () {
     return {
       distance: null
-    }
-  },
-  watch: {
-    geo () {
-      if (this.cafe && this.cafe.geo && this.geo && this.geo.lat && this.geo.lng) {
-        const distance = GeoServices.calculateDistance(this.geo, {
-          lat: this.cafe.geo[0],
-          lng: this.cafe.geo[1]
-        });
-        if (distance > 1) this.distance = `${Math.round(distance)} km`;
-        else this.distance = `${Math.round(distance * 1000)} m`;
-      }
     }
   },
   methods: {
@@ -79,11 +72,16 @@ h2{
   font-size: 16px;
   margin-top: 0px;
   margin-bottom: 0px;
+  font-weight: normal;
+}
+.bold{
+  font-weight: bold;
 }
 .cafe-list-unit{
   padding: 10px;
   transition: all .5s linear;
-  border: solid 1px white;
+  border: solid 1px rgb(220, 220, 220);
+  border-radius: 5px;
 }
 .selected-cafe-list-unit{
   border-color: #3f51b5;
@@ -120,5 +118,8 @@ a{
 }
 .flex-1{
   flex-grow: 1;
+}
+.text-align-right{
+  text-align: right;
 }
 </style>

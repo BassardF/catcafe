@@ -1,7 +1,6 @@
 <template>
-  <div v-bind:style="{ padding: '20px' }">
-    <div class="pointer blue text-align-center"
-      v-on:click="$emit('hide')">
+  <div id="cafe-detail-wrapper" v-bind:style="{ padding: '20px', paddingBottom: '100px' }">
+    <div class="button" v-on:click="$emit('hide')">
       <i
         v-bind:style="{ marginRight: '3px' }"
         class="fas fa-globe v-align-middle"></i>
@@ -16,7 +15,9 @@
           </div>
           <!-- Rating -->
           <div class="flex-1 text-align-right">
-            <h2 v-if="place && place.rating">{{ place.rating }}/5</h2>
+            <h2 v-if="place && place.rating">
+              <rating :rating="place.rating"/>
+            </h2>
           </div>
         </div>
       </slot>
@@ -51,6 +52,12 @@
             </div>
           </div>
           <div class="flex-1 text-align-right">
+            <!-- Distance -->
+            <div v-if="cafe.distance" v-bind:style="{ marginBottom: '5px' }">
+              <i class="fas fa-location-arrow v-align-middle"
+                 v-bind:style="{ marginRight: '3px' }"></i>
+              <span class="v-align-middle">{{ cafe.distance }}</span>
+            </div>
             <!-- Fees -->
             <div v-if="cafe && cafe.fee && cafe.fee.from" v-bind:style="{ marginBottom: '5px' }">
               ${{ cafe.fee.from }} and up
@@ -79,55 +86,72 @@
               v-show="showSchedule"
               v-if="placeDetails && placeDetails.opening_hours && placeDetails.opening_hours.weekday_text"
               v-bind:style="{ fontSize: '12px'}">
-              <div v-bind:key='"open-day-key-"+index' v-for="(day, index) in placeDetails.opening_hours.weekday_text">
-                <div>{{ day }}</div>
+              <div v-bind:key='"open-day-key-"+index'
+                   v-for="(day, index) in placeDetails.opening_hours.weekday_text">
+                <div v-bind:class="boldDay(day)">{{ day }}</div>
               </div>
             </div>
           </div>
         </div>
         <!-- Images -->
-        <div v-if="placeDetails && placeDetails.photos" v-bind:style="{ marginTop: '10px' }">
-          <carousel :perPage="2" :perPageCustom="[[480, 1], [768, 2]]">
-            <slide v-bind:key='"pic-key-"+index' v-for="(pic, index) in placeDetails.photos">
-              <div class="text-align-center"><img :src="pic.url"/></div>
-            </slide>
-          </carousel>
+        <h3>Photos</h3>
+        <div>
+          <div v-if="placeDetails && placeDetails.photos" v-bind:style="{ marginTop: '10px' }">
+            <carousel :paginationActiveColor="'#2c3e50'" :paginationColor="'rgb(230, 230, 230)'" :perPage="1" :perPageCustom="[[480, 1], [768, 1]]">
+              <slide v-bind:key='"pic-key-"+index' v-for="(pic, index) in placeDetails.photos">
+                <div class="text-align-center"><img :src="pic.url"/></div>
+              </slide>
+            </carousel>
+          </div>
         </div>
+        <div v-bind:style="{ height: '30px' }"></div>
+        <h3>Details and Social</h3>
         <!-- Details -->
-        <div>{{ cafe.booking }}</div>
-        <div>{{ cafe.cats }}</div>
+        <div v-if="cafe.booking" v-bind:style="{ marginBottom : '5px' }">
+          <i class="fas fa-book v-align-middle" v-bind:style="{ marginRight : '3px' }"></i>
+          <span class="v-align-middle">Booking {{ cafe.booking.toLowerCase() }}</span>
+        </div>
+        <div v-if="cafe.cats && cafe.cats.count">
+          <i class="fas fa-paw v-align-middle" v-bind:style="{ marginRight : '3px' }"></i>
+          <span class="v-align-middle">{{ cafe.cats.count }} cats</span>
+        </div>
         <!-- Social -->
-        <div v-if="!!cafe.social">
-          <div v-if="!!cafe.social.facebook">
-            <a :href="cafe.social.facebook">facebook</a>
+        <div v-if="!!cafe.social" class="flex" v-bind:style="{ marginTop: '10px' }">
+          <div v-if="!!cafe.social.facebook" class="flex-1 text-align-center">
+            <a class="social-name" :href="cafe.social.facebook"><i class="fab fa-3x fa-facebook"></i></a>
           </div>
-          <div v-if="!!cafe.social.instagram">
-            <a :href="cafe.social.instagram">instagram</a>
+          <div v-if="!!cafe.social.instagram" class="flex-1 text-align-center">
+            <a class="social-name" :href="cafe.social.instagram"><i class="fab fa-3x fa-instagram"></i></a>
           </div>
-          <div v-if="!!cafe.social.tripadvisor">
-            <a :href="cafe.social.tripadvisor">tripadvisor</a>
+          <div v-if="!!cafe.social.tripadvisor" class="flex-1 text-align-center">
+            <a class="social-name" :href="cafe.social.tripadvisor"><i class="fab fa-3x fa-tripadvisor"></i></a>
           </div>
-          <div v-if="!!cafe.social.twitter">
-            <a :href="cafe.social.twitter">twitter</a>
+          <div v-if="!!cafe.social.twitter" class="flex-1 text-align-center">
+            <a class="social-name" :href="cafe.social.twitter"><i class="fab fa-3x fa-twitter-square"></i></a>
           </div>
-          <div v-if="!!cafe.social.youtube">
-            <a :href="cafe.social.youtube">youtube</a>
+          <div v-if="!!cafe.social.youtube" class="flex-1 text-align-center">
+            <a class="social-name" :href="cafe.social.youtube"><i class="fab fa-3x fa-youtube"></i></a>
           </div>
         </div>
+        <h3>Reviews</h3>
         <!-- Reviews -->
         <div v-if="placeDetails && placeDetails.reviews">
-          <carousel :perPage="1">
+          <carousel :paginationActiveColor="'#2c3e50'" :paginationColor="'rgb(230, 230, 230)'" :perPage="1">
             <slide v-bind:key='"review-key-"+index' v-for="(review, index) in placeDetails.reviews">
               <div v-if="review.language == 'en'">
                 <div class="flex">
                   <div class="flex-1">
-                    <h3>{{ review.author_name }}</h3>
+                    <h4>
+                      <span>{{ review.author_name }}</span>
+                      <span v-bind:style="{ marginLeft: '5px', opacity: .8, fontSize: '12px' }">{{ review.timeFormatted }}</span>
+                    </h4>
                   </div>
                   <div class="flex-1 text-align-right">
-                    <h3 v-if="place && place.rating">{{ review.rating }}/5</h3>
+                    <h4 v-if="place && place.rating">
+                      <rating :rating="review.rating"/>
+                    </h4>
                   </div>
                 </div>
-                <div>{{ review.time }}</div>
                 <div>{{ review.text }}</div>
               </div>
             </slide>
@@ -141,14 +165,18 @@
 
 <script>
 import GeoServices from '../services/geo'
+import FormatterServices from '../services/formatter'
+import Rating from './dumbs/Rating'
 
 export default {
   name: 'CafeDetailed',
+  components: { Rating },
   data () {
     return {
       place: {},
       placeDetails: {},
-      showSchedule: false
+      showSchedule: false,
+      dayIndex: 0
     }
   },
   watch: {
@@ -158,8 +186,15 @@ export default {
   },
   created () {
     this.placeSearch(this.cafe.name);
+    this.dayIndex = new Date().getDay();
   },
   methods: {
+    boldDay (key) {
+      const weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+      return {
+        bold: key && weekdays && key.includes(weekdays[this.dayIndex])
+      };
+    },
     placeSearch (query) {
       GeoServices.placeSearch(this.map, query).then((ans) => {
         if (ans && ans.place_id) this.placeDetailsSearch(ans.place_id);
@@ -171,9 +206,14 @@ export default {
     placeDetailsSearch (placeId) {
       GeoServices.detailedPlaceSearch(this.map, placeId).then((ans) => {
         if (ans.photos) {
-          for (var i = 0; i < ans.photos.length; i++) {
-            let url = ans.photos[i].getUrl({'maxWidth': 400, 'maxHeight': 400});
+          for (let i = 0; i < ans.photos.length; i++) {
+            let url = ans.photos[i].getUrl({'maxWidth': 420, 'maxHeight': 250});
             ans.photos[i].url = url;
+          }
+        }
+        if (ans.reviews) {
+          for (let i = 0; i < ans.reviews.length; i++) {
+            if (ans.reviews[i].time) ans.reviews[i].timeFormatted = FormatterServices.formatDate(ans.reviews[i].time);
           }
         }
         this.placeDetails = ans;
@@ -195,6 +235,13 @@ h2{
   border-bottom: solid 1px #3f51b5;
 }
 h3{
+  font-weight: normal;
+  padding: 10px 20px;
+  background-color: rgb(250, 250, 250);
+  margin-left: -20px;
+  margin-right: -20px;
+}
+h4{
   font-weight: normal;
   border-bottom: solid 1px #3f51b5;
 }
@@ -228,5 +275,32 @@ h3{
 a{
   text-decoration: none;
   color: #3f51b5;
+}
+.social-name{
+  font-size: 12px
+}
+.bold{
+  font-weight: bold;
+}
+.button {
+  background-color: #3f51b5;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
+  margin-top: 10px;
+  cursor: pointer;
+  text-align: center;
+}
+.button .main{
+  font-size: 16px;
+}
+.button .second{
+  font-size: 13px;
+  opacity: .8;
+  margin-top: 2px;
 }
 </style>

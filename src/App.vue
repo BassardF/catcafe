@@ -4,6 +4,7 @@
     <div id="core-wrapper">
       <router-view/>
     </div>
+    <bottombar/>
   </div>
 </template>
 
@@ -11,11 +12,12 @@
 import Vue from 'vue';
 import VueCarousel from 'vue-carousel';
 import Topbar from './components/dumbs/Topbar'
+import Bottombar from './components/dumbs/Bottombar'
 
 Vue.use(VueCarousel);
 export default {
   name: 'App',
-  components: { Topbar }
+  components: { Topbar, Bottombar }
 }
 </script>
 

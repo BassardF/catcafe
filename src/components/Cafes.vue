@@ -8,13 +8,16 @@
           <div v-for="cafe in cafes" v-bind:key="cafe.key">
             <cafe-list-unit
               :cafe="cafe"
-              :geo="geo"
               :expanded="expanded"
               :detailed="detailed"
               v-on:select="selectExpanded"
               v-on:details="showDetailedView"
               v-on:hide="hideDetailedView"/>
           </div>
+          <button class="button">
+            <div class="main">Another Cat cafe?</div>
+            <div class="second">share your discovery with us!</div>
+          </button>
         </div>
       </div>
       <div class="right-column">
@@ -93,6 +96,7 @@ export default {
           })
         })
         this.cafes = tmpCafes;
+        this.reCalculateCafeDistance();
       });
     },
     selectExpanded (key) {
@@ -129,10 +133,30 @@ export default {
             lat: position.coords.latitude,
             lng: position.coords.longitude
           };
+          this.reCalculateCafeDistance();
         }
       }).catch(() => {
         console.log('Geolocalisation unauthorized : silent fail');
       });
+    },
+    reCalculateCafeDistance () {
+      if (this.cafes && this.geo && this.geo.lat && this.geo.lng) {
+        for (var i = 0; i < this.cafes.length; i++) {
+          if (this.cafes[i].geo) {
+            const distance = GeoServices.calculateDistance(this.geo, {
+              lat: this.cafes[i].geo[0],
+              lng: this.cafes[i].geo[1]
+            });
+            this.cafes[i].mathDistance = distance;
+            if (distance > 1) this.cafes[i].distance = `${Math.round(distance)} km`;
+            else this.cafes[i].distance = `${Math.round(distance * 1000)} m`;
+          }
+        }
+        this.cafes.sort((a, b) => {
+          if (!a.mathDistance || !b.mathDistance) return -1;
+          return a.mathDistance > b.mathDistance ? 1 : -1;
+        });
+      }
     }
   }
 }
@@ -167,6 +191,7 @@ h1{
   .left-column{
     display: inline-block;
     width: 40%;
+    background-color: rgb(250, 250, 250);
   }
   .right-column{
     display: inline-block;
@@ -187,6 +212,26 @@ h1{
   margin-bottom: 10px;
 }
 #cafe-list-wrapper > div:nth-child(even){
-  background-color: rgb(248, 248, 250);
+  background-color: rgb(250, 250, 250);
+}
+.button {
+  background-color: #3f51b5;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
+  margin-top: 15px;
+  cursor: pointer;
+}
+.button .main{
+  font-size: 16px;
+}
+.button .second{
+  font-size: 13px;
+  opacity: .8;
+  margin-top: 2px;
 }
 </style>
