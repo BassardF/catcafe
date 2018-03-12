@@ -1,8 +1,8 @@
 <template>
   <div>
     <div class="flex">
-      <div class="left-column">
-        <h1>{{ $route.params.city }}, {{ $route.params.country }}</h1>
+      <div id="left-column">
+        <h1>{{ $route.params.city.capitalize() }}, {{ $route.params.country.capitalize() }}</h1>
         <div id="cafe-list-wrapper">
           <city-search v-on:placeSelected="placeSelected"/>
           <div v-for="cafe in cafes" v-bind:key="cafe.key">
@@ -14,15 +14,19 @@
               v-on:details="showDetailedView"
               v-on:hide="hideDetailedView"/>
           </div>
+          <div v-if="loading === false && !cafes.length" class="text-align-center" v-bind:style="{ marginTop: '30px', marginBottom: '30px' }">
+            No result available for {{ $route.params.city.capitalize() }}, {{ $route.params.country.capitalize() }}
+          </div>
           <button class="button">
             <div class="main">Another Cat cafe?</div>
             <div class="second">share your discovery with us!</div>
           </button>
         </div>
       </div>
-      <div class="right-column">
+      <div id="right-column">
         <div v-show="!detailed || !selectedCafe" id="map-global-wrapper">
           <cafes-map
+            :search="$route.params.city+$route.params.country"
             :cafes="cafes"
             :geo="geo"
             :expanded="expanded"
@@ -62,7 +66,8 @@ export default {
       expanded: '',
       geo: {},
       detailed: false,
-      map: null
+      map: null,
+      loading: true
     }
   },
   watch: {
@@ -80,7 +85,6 @@ export default {
     },
     formatCafe (cafe) {
       if (cafe) {
-        if (cafe.phone) cafe.phoneFormatted = FormatterServices.formatPhoneNumber(cafe.phone);
         if (cafe.website) cafe.websiteFormatted = FormatterServices.formatWebsite(cafe.website);
       }
       return cafe;
@@ -95,7 +99,9 @@ export default {
             key: doc.id
           })
         })
+        console.log('tmpCafes', tmpCafes);
         this.cafes = tmpCafes;
+        this.loading = false;
         this.reCalculateCafeDistance();
       });
     },
@@ -180,20 +186,20 @@ h1{
   flex-grow: 2;
 }
 @media (max-width: 768px) {
-  .left-column{
+  #left-column{
     display: none;
   }
-  .right-column{
+  #right-column{
     display: block;
   }
 }
 @media (min-width: 769px) {
-  .left-column{
+  #left-column{
     display: inline-block;
     width: 40%;
     background-color: rgb(250, 250, 250);
   }
-  .right-column{
+  #right-column{
     display: inline-block;
     width: 60%;
   }
@@ -204,7 +210,7 @@ h1{
   max-width: 100%!important;
 }
 #cafe-list-wrapper {
-  padding: 10px;
+  padding: 15px;
 }
 #cafe-list-wrapper > div{
   border-radius: 5px;
@@ -233,5 +239,8 @@ h1{
   font-size: 13px;
   opacity: .8;
   margin-top: 2px;
+}
+.text-align-center{
+  text-align: center;
 }
 </style>

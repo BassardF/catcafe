@@ -1,6 +1,7 @@
 <template>
   <div id="topbar">
-    <span id="brand" v-on:click="goToMainPage">CAT CAFE NEAR YOU</span>
+    <img src="../../../static/logo-cat.svg" v-bind:style="{ width: '40px', verticalAlign: 'middle' }"/>
+    <span id="brand" v-on:click="goToMainPage" v-bind:style="{ marginLeft: '20px', verticalAlign: 'middle' }">CAT CAFE NEAR YOU</span>
   </div>
 </template>
 

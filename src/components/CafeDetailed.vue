@@ -28,24 +28,24 @@
         <div class="flex">
           <div class="flex-1">
             <!-- Address -->
-            <div v-if="placeDetails && placeDetails.url" v-bind:style="{ marginBottom: '5px' }">
+            <div v-bind:style="{ marginBottom: '5px' }" v-if="placeDetails && placeDetails.url && cafe.address" >
               <i v-bind:style="{ marginLeft: '3px', marginRight: '5px' }"
                  class="fas fa-map-marker-alt v-align-middle"></i>
               <a target="_blank" class="v-align-middle" :href="placeDetails.url">{{ cafe.address }}</a>
             </div>
             <!-- Contact -->
-            <div v-bind:style="{ marginBottom: '5px' }">
+            <div v-bind:style="{ marginBottom: '5px' }" v-if="cafe.international_phone_number && cafe.formatted_phone_number">
               <i v-bind:style="{ marginRight: '5px' }"
                  class="fas fa-phone v-align-middle"></i>
-              <a target="_blank" class="v-align-middle" :href="`tel:${cafe.phone}`">{{ cafe.phoneFormatted }}</a>
+              <a target="_blank" class="v-align-middle" :href="`tel:${cafe.international_phone_number}`">{{ cafe.formatted_phone_number }}</a>
             </div>
-            <div v-bind:style="{ marginBottom: '5px' }">
+            <div v-bind:style="{ marginBottom: '5px' }" v-if="cafe.email">
               <i v-bind:style="{ marginRight: '5px' }"
                  class="fas fa-at v-align-middle"></i>
               <a target="_blank" class="v-align-middle" :href="`mailto:${cafe.email}`">{{ cafe.email }}</a>
             </div>
             <!-- Website -->
-            <div v-bind:style="{ marginBottom: '5px' }">
+            <div v-bind:style="{ marginBottom: '5px' }" v-if="cafe.website && cafe.websiteFormatted">
               <i v-bind:style="{ marginRight: '5px' }"
                  class="fas fa-link v-align-middle"></i>
               <a target="_blank" class="v-align-middle" :href="cafe.website">{{ cafe.websiteFormatted }}</a>
@@ -105,15 +105,17 @@
           </div>
         </div>
         <div v-bind:style="{ height: '30px' }"></div>
-        <h3>Details and Social</h3>
-        <!-- Details -->
-        <div v-if="cafe.booking" v-bind:style="{ marginBottom : '5px' }">
-          <i class="fas fa-book v-align-middle" v-bind:style="{ marginRight : '3px' }"></i>
-          <span class="v-align-middle">Booking {{ cafe.booking.toLowerCase() }}</span>
-        </div>
-        <div v-if="cafe.cats && cafe.cats.count">
-          <i class="fas fa-paw v-align-middle" v-bind:style="{ marginRight : '3px' }"></i>
-          <span class="v-align-middle">{{ cafe.cats.count }} cats</span>
+        <div v-if="cafe.booking || cafe.cats">
+          <h3>Details and Social</h3>
+          <!-- Details -->
+          <div v-if="cafe.booking" v-bind:style="{ marginBottom : '5px' }">
+            <i class="fas fa-book v-align-middle" v-bind:style="{ marginRight : '3px' }"></i>
+            <span class="v-align-middle">Booking {{ cafe.booking.toLowerCase() }}</span>
+          </div>
+          <div v-if="cafe.cats && cafe.cats.count">
+            <i class="fas fa-paw v-align-middle" v-bind:style="{ marginRight : '3px' }"></i>
+            <span class="v-align-middle">{{ cafe.cats.count }} cats</span>
+          </div>
         </div>
         <!-- Social -->
         <div v-if="!!cafe.social" class="flex" v-bind:style="{ marginTop: '10px' }">
@@ -133,29 +135,35 @@
             <a class="social-name" :href="cafe.social.youtube"><i class="fab fa-3x fa-youtube"></i></a>
           </div>
         </div>
-        <h3>Reviews</h3>
-        <!-- Reviews -->
-        <div v-if="placeDetails && placeDetails.reviews">
-          <carousel :paginationActiveColor="'#2c3e50'" :paginationColor="'rgb(230, 230, 230)'" :perPage="1">
-            <slide v-bind:key='"review-key-"+index' v-for="(review, index) in placeDetails.reviews">
-              <div v-if="review.language == 'en'">
-                <div class="flex">
-                  <div class="flex-1">
-                    <h4>
-                      <span>{{ review.author_name }}</span>
-                      <span v-bind:style="{ marginLeft: '5px', opacity: .8, fontSize: '12px' }">{{ review.timeFormatted }}</span>
-                    </h4>
-                  </div>
-                  <div class="flex-1 text-align-right">
-                    <h4 v-if="place && place.rating">
-                      <rating :rating="review.rating"/>
-                    </h4>
-                  </div>
+        <div v-if="placeDetails && placeDetails.reviews && placeDetails.reviews.length">
+          <h3>Reviews</h3>
+          <!-- Reviews -->
+          <div v-bind:key='"review-key-"+index' v-for="(review, index) in placeDetails.reviews">
+            <div v-if="index === 0 || showAllReviews">
+              <div class="flex">
+                <div class="flex-1">
+                  <h4>
+                    <span>{{ review.author_name }}</span>
+                    <span v-bind:style="{ marginLeft: '5px', opacity: .8, fontSize: '12px' }">{{ review.timeFormatted }}</span>
+                  </h4>
                 </div>
-                <div>{{ review.text }}</div>
+                <div class="flex-1 text-align-right">
+                  <h4 v-if="place && place.rating">
+                    <rating :rating="review.rating"/>
+                  </h4>
+                </div>
               </div>
-            </slide>
-          </carousel>
+              <div>{{ review.text }}</div>
+            </div>
+          </div>
+
+          <div v-if="placeDetails.reviews && placeDetails.reviews.length > 1 && !showAllReviews" class="button" v-on:click="showAllReviews = true">
+            <i
+              v-bind:style="{ marginRight: '3px' }"
+              class="fas fa-plus v-align-middle"></i>
+            <span class="v-align-middle">show more reviews</span>
+          </div>
+
         </div>
       </slot>
     </div>
@@ -176,7 +184,8 @@ export default {
       place: {},
       placeDetails: {},
       showSchedule: false,
-      dayIndex: 0
+      dayIndex: 0,
+      showAllReviews: false
     }
   },
   watch: {

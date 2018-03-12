@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div id="map-wrapper">
     <div id="map"></div>
   </div>
 </template>
@@ -10,11 +10,14 @@ export default {
   props: {
     cafes: Array,
     geo: Object,
-    expanded: String
+    expanded: String,
+    search: String
   },
   mounted () {
     if (this.cafes && this.cafes.length) {
       this.drawMap(this.cafes);
+      this.currentCafeLength = this.cafes.length;
+      this.currentSearch = this.search;
     }
   },
   watch: {
@@ -30,7 +33,11 @@ export default {
       }
     },
     cafes (cafs) {
-      this.drawMap(cafs);
+      if (cafs.length !== this.currentCafeLength || this.currentSearch !== this.search) {
+        this.currentCafeLength = this.cafes.length;
+        this.currentSearch = this.search;
+        this.drawMap(cafs);
+      }
     }
   },
   data () {
@@ -42,9 +49,16 @@ export default {
   },
   methods: {
     drawMap (cafs) {
+      // Size map
+      const lcWidth = document.getElementById('left-column').offsetWidth;
+      const width = lcWidth ? document.getElementById('right-column').offsetWidth : document.getElementById('core-wrapper').offsetWidth;
+      document.getElementById('map').style.width = width + 'px';
       // Init the Map
       this.initialZoom = true;
-      this.map = new google.maps.Map(document.getElementById('map'), {zoom: 10});
+      this.map = new google.maps.Map(document.getElementById('map'), {
+        center: {lat: 48, lng: 2},
+        zoom: 10
+      });
       // Resize the minimum zoom after the 1st render
       google.maps.event.addListener(this.map, 'zoom_changed', () => {
         let zoomChangeBoundsListener = google.maps.event.addListener(this.map, 'bounds_changed', (event) => {
@@ -71,20 +85,22 @@ export default {
             content: this.generateInfo(cafs[i])
           });
           marker.infowindow = infowindow;
-          marker.addListener('click', () => {
+          marker.addListener('click', function (c) {
             infowindow.open(this.map, marker);
             // Add see more listener
-            document.getElementById('see-more-' + cafs[i].key).addEventListener('click', () => {
-              this.showDetails(cafs[i].key);
-            });
-          });
+            const elt = document.getElementById('see-more-' + c.key);
+            if (elt) elt.addEventListener('click', () => { this.showDetails(c.key) });
+          }.bind(this, cafs[i]));
           this.markers[cafs[i].key] = marker;
           // Extend bound to include Marker
           bounds.extend(marker.position);
         }
+        // Resize bounds
+        this.map.fitBounds(bounds);
+      } else {
+        this.map.setZoom(2);
       }
-      // Resize bounds
-      this.map.fitBounds(bounds);
+
       // Bubble map
       this.$emit('setmap', this.map)
     },
@@ -114,7 +130,6 @@ export default {
 <style scoped>
 #map {
   height: 600px;
-  width: 100%;
 }
 h2{
   margin: 0px;

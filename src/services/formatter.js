@@ -7,7 +7,7 @@ export default class FormatterServices {
     return number;
   }
   static formatWebsite (website) {
-    const strings = ['https', 'http', '://', 'www.'];
+    const strings = ['https', 'http', '://', 'www.', 'facebook.com/'];
     if (website) {
       for (var i = 0; i < strings.length; i++) {
         website = website.replace(new RegExp(strings[i], 'g'), '');

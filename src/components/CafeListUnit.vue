@@ -1,6 +1,5 @@
 <template>
   <div v-on:click="select" class="cafe-list-unit" v-bind:class="{ 'selected-cafe-list-unit': expanded === cafe.key }">
-
     <div class="flex">
       <div class="flex-1">
         <h2 class="bold">{{ cafe.name }}</h2>
@@ -15,7 +14,7 @@
     </div>
     <div>{{ cafe.address }}</div>
     <div class="inner-info">
-      <div>{{ cafe.phoneFormatted }}</div>
+      <div>{{ cafe.formatted_phone_number }}</div>
       <div>{{ cafe.email }}</div>
       <div class="flex">
         <div class="flex-1 blue">
@@ -78,7 +77,7 @@ h2{
   font-weight: bold;
 }
 .cafe-list-unit{
-  padding: 10px;
+  padding: 15px;
   transition: all .5s linear;
   border: solid 1px rgb(220, 220, 220);
   border-radius: 5px;
