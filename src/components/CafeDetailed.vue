@@ -22,7 +22,6 @@
         </div>
       </slot>
     </div>
-
     <div>
       <slot name="body">
         <div class="flex">
@@ -93,18 +92,7 @@
             </div>
           </div>
         </div>
-        <!-- Images -->
-        <h3>Photos</h3>
-        <div>
-          <div v-if="placeDetails && placeDetails.photos" v-bind:style="{ marginTop: '10px' }">
-            <carousel :paginationActiveColor="'#2c3e50'" :paginationColor="'rgb(230, 230, 230)'" :perPage="1" :perPageCustom="[[480, 1], [768, 1]]">
-              <slide v-bind:key='"pic-key-"+index' v-for="(pic, index) in placeDetails.photos">
-                <div class="text-align-center"><img :src="pic.url"/></div>
-              </slide>
-            </carousel>
-          </div>
-        </div>
-        <div v-bind:style="{ height: '30px' }"></div>
+
         <div v-if="cafe.booking || cafe.cats">
           <h3>Details and Social</h3>
           <!-- Details -->
@@ -135,6 +123,20 @@
             <a class="social-name" :href="cafe.social.youtube"><i class="fab fa-3x fa-youtube"></i></a>
           </div>
         </div>
+
+        <!-- Images -->
+        <h3>Photos</h3>
+        <div>
+          <div v-if="placeDetails && placeDetails.photos" v-bind:style="{ marginTop: '10px' }">
+            <carousel :paginationActiveColor="'#2c3e50'" :paginationColor="'rgb(230, 230, 230)'" :perPage="1" :perPageCustom="[[480, 1], [768, 1]]">
+              <slide v-bind:key='"pic-key-"+index' v-for="(pic, index) in placeDetails.photos">
+                <div class="text-align-center"><img :src="pic.url"/></div>
+              </slide>
+            </carousel>
+          </div>
+        </div>
+        <div v-bind:style="{ height: '30px' }"></div>
+
         <div v-if="placeDetails && placeDetails.reviews && placeDetails.reviews.length">
           <h3>Reviews</h3>
           <!-- Reviews -->

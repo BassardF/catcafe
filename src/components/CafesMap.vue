@@ -23,13 +23,7 @@ export default {
   watch: {
     expanded () {
       if (this.expanded && this.markers[this.expanded]) {
-        const mk = this.markers[this.expanded];
-        this.closeMarkers();
-        google.maps.event.trigger(mk, 'click');
-        const latLng = mk.getPosition();
-        if (!this.map.getBounds().contains(mk.getPosition())) {
-          this.map.setCenter(latLng)
-        }
+        this.selectAndCenterExpanded();
       }
     },
     cafes (cafs) {
@@ -48,6 +42,17 @@ export default {
     }
   },
   methods: {
+    selectAndCenterExpanded (force) {
+      if (this.expanded && this.markers[this.expanded]) {
+        const mk = this.markers[this.expanded];
+        this.closeMarkers();
+        google.maps.event.trigger(mk, 'click');
+        const latLng = mk.getPosition();
+        if (force || !this.map.getBounds().contains(mk.getPosition())) {
+          this.map.setCenter(latLng)
+        }
+      }
+    },
     drawMap (cafs) {
       // Size map
       const lcWidth = document.getElementById('left-column').offsetWidth;
@@ -103,6 +108,7 @@ export default {
 
       // Bubble map
       this.$emit('setmap', this.map)
+      if (this.expanded) this.selectAndCenterExpanded(true);
     },
     showDetails (key) {
       this.$emit('details', key)

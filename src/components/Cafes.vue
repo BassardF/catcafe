@@ -91,9 +91,11 @@ export default {
     },
     fetchCafes () {
       let tmpCafes = [];
+      let preSelectedKey = null;
       db.collection(`countries/${this.$route.params.country}/cities/${this.$route.params.city}/catcafes`).get().then((querySnapshot) => {
         querySnapshot.forEach((doc) => {
           let docData = this.formatCafe(doc.data());
+          if (this.$route.params.placeid && this.$route.params.placeid === docData.place_id) preSelectedKey = doc.id;
           tmpCafes.push({
             ...docData,
             key: doc.id
@@ -103,6 +105,7 @@ export default {
         this.cafes = tmpCafes;
         this.loading = false;
         this.reCalculateCafeDistance();
+        if (preSelectedKey) this.expanded = preSelectedKey;
       });
     },
     selectExpanded (key) {

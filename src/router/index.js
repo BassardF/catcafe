@@ -15,6 +15,10 @@ export default new Router({
       path: '/:country/:city',
       name: 'Cafes',
       component: Cafes
+    }, {
+      path: '/:country/:city/:placeid',
+      name: 'Cafes',
+      component: Cafes
     }
   ]
 })
