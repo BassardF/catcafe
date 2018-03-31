@@ -17,7 +17,7 @@ export default new Router({
       component: Cafes
     }, {
       path: '/:country/:city/:placeid',
-      name: 'Cafes',
+      name: 'CafesDirect',
       component: Cafes
     }
   ]

@@ -2,7 +2,7 @@
   <div>
     <div class="flex">
       <div id="left-column">
-        <h1>{{ $route.params.city.capitalize() }}, {{ $route.params.country.capitalize() }}</h1>
+        <h1>Cat cafés in {{ $route.params.city.capitalize() }}, {{ $route.params.country.capitalize() }}</h1>
         <div id="cafe-list-wrapper">
           <city-search v-on:placeSelected="placeSelected"/>
           <div v-for="cafe in cafes" v-bind:key="cafe.key">
@@ -17,10 +17,12 @@
           <div v-if="loading === false && !cafes.length" class="text-align-center" v-bind:style="{ marginTop: '30px', marginBottom: '30px' }">
             No result available for {{ $route.params.city.capitalize() }}, {{ $route.params.country.capitalize() }}
           </div>
-          <button class="button">
-            <div class="main">Another Cat cafe?</div>
-            <div class="second">share your discovery with us!</div>
-          </button>
+          <a href="https://goo.gl/forms/dceEOK9lgOPk8cqN2" target="_blank">
+            <button class="button">
+              <div class="main">Another Cat cafe?</div>
+              <div class="second">share your discovery with us!</div>
+            </button>
+          </a>
         </div>
       </div>
       <div id="right-column">
@@ -173,7 +175,7 @@ export default {
 
 <style scoped>
 h1{
-  font-size: 25px;
+  font-size: 22px;
   margin-top: 30px;
   margin-bottom: 10px;
   text-align: center;
@@ -234,6 +236,9 @@ h1{
   display: block;
   margin-top: 15px;
   cursor: pointer;
+}
+a {
+  text-decoration: none !important;
 }
 .button .main{
   font-size: 16px;

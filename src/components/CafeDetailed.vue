@@ -1,5 +1,5 @@
 <template>
-  <div id="cafe-detail-wrapper" v-bind:style="{ padding: '20px', paddingBottom: '100px' }">
+  <div id="cafe-detail-wrapper" v-bind:style="{ padding: '20px' }">
     <div class="button" v-on:click="$emit('hide')">
       <i
         v-bind:style="{ marginRight: '3px' }"
@@ -9,17 +9,19 @@
     <div>
       <slot name="header">
         <!-- Name && Rating -->
-        <div class="flex">
-          <div class="flex-1">
-            <h2>{{ cafe.name }}</h2>
+        <h2>
+          <div class="flex">
+            <div class="flex-1 v-align-middle">
+              {{ cafe.name }}
+            </div>
+            <!-- Distance -->
+            <div class="flex-1 v-align-middle text-align-right" v-if="cafe.distance" v-bind:style="{ marginBottom: '5px', fontSize: '20px' }">
+              <i class="fas fa-location-arrow v-align-middle"
+                 v-bind:style="{ marginRight: '3px' }"></i>
+              <span class="v-align-middle">{{ cafe.distance }}</span>
+            </div>
           </div>
-          <!-- Rating -->
-          <div class="flex-1 text-align-right">
-            <h2 v-if="place && place.rating">
-              <rating :rating="place.rating"/>
-            </h2>
-          </div>
-        </div>
+        </h2>
       </slot>
     </div>
     <div>
@@ -51,11 +53,11 @@
             </div>
           </div>
           <div class="flex-1 text-align-right">
-            <!-- Distance -->
-            <div v-if="cafe.distance" v-bind:style="{ marginBottom: '5px' }">
-              <i class="fas fa-location-arrow v-align-middle"
-                 v-bind:style="{ marginRight: '3px' }"></i>
-              <span class="v-align-middle">{{ cafe.distance }}</span>
+            <!-- Rating -->
+            <div class="text-align-right" v-bind:style="{ fontSize: '13px' }">
+              <div v-if="place && place.rating">
+                <rating :rating="place.rating" :showNumber="true" :large="false"/>
+              </div>
             </div>
             <!-- Fees -->
             <div v-if="cafe && cafe.fee && cafe.fee.from" v-bind:style="{ marginBottom: '5px' }">
@@ -125,34 +127,35 @@
         </div>
 
         <!-- Images -->
-        <h3>Photos</h3>
-        <div>
+        <div id="photos-wrapper">
           <div v-if="placeDetails && placeDetails.photos" v-bind:style="{ marginTop: '10px' }">
-            <carousel :paginationActiveColor="'#2c3e50'" :paginationColor="'rgb(230, 230, 230)'" :perPage="1" :perPageCustom="[[480, 1], [768, 1]]">
+            <full-page-carousel
+              :photos="placeDetails.photos"
+            />
+            <!-- <carousel :paginationActiveColor="'#2c3e50'" :paginationColor="'rgb(230, 230, 230)'" :perPage="1" :perPageCustom="[[480, 1], [768, 1]]">
               <slide v-bind:key='"pic-key-"+index' v-for="(pic, index) in placeDetails.photos">
                 <div class="text-align-center"><img :src="pic.url"/></div>
               </slide>
-            </carousel>
+            </carousel> -->
           </div>
         </div>
-        <div v-bind:style="{ height: '30px' }"></div>
 
         <div v-if="placeDetails && placeDetails.reviews && placeDetails.reviews.length">
           <h3>Reviews</h3>
           <!-- Reviews -->
           <div v-bind:key='"review-key-"+index' v-for="(review, index) in placeDetails.reviews">
             <div v-if="index === 0 || showAllReviews">
-              <div class="flex">
+              <h4>
+                <span>{{ review.author_name }}</span>
+              </h4>
+              <div class="flex"  v-bind:style="{ marginTop: '-15px', marginBottom: '15px' }">
                 <div class="flex-1">
-                  <h4>
-                    <span>{{ review.author_name }}</span>
-                    <span v-bind:style="{ marginLeft: '5px', opacity: .8, fontSize: '12px' }">{{ review.timeFormatted }}</span>
-                  </h4>
+                  <span v-bind:style="{ opacity: .8, fontSize: '12px' }">{{ review.timeFormatted }}</span>
                 </div>
-                <div class="flex-1 text-align-right">
-                  <h4 v-if="place && place.rating">
-                    <rating :rating="review.rating"/>
-                  </h4>
+                <div class="flex-1">
+                  <div v-bind:style="{ textAlign: 'right' }">
+                    <rating :rating="review.rating" :showNumber="true"/>
+                  </div>
                 </div>
               </div>
               <div>{{ review.text }}</div>
@@ -177,10 +180,14 @@
 import GeoServices from '../services/geo'
 import FormatterServices from '../services/formatter'
 import Rating from './dumbs/Rating'
+import FullPageCarousel from './dumbs/carousel'
 
 export default {
   name: 'CafeDetailed',
-  components: { Rating },
+  components: {
+    Rating,
+    'full-page-carousel': FullPageCarousel
+  },
   data () {
     return {
       place: {},
@@ -218,7 +225,7 @@ export default {
       GeoServices.detailedPlaceSearch(this.map, placeId).then((ans) => {
         if (ans.photos) {
           for (let i = 0; i < ans.photos.length; i++) {
-            let url = ans.photos[i].getUrl({'maxWidth': 420, 'maxHeight': 250});
+            let url = ans.photos[i].getUrl({'maxWidth': 1600, 'maxHeight': 1600});
             ans.photos[i].url = url;
           }
         }
@@ -249,12 +256,13 @@ h3{
   font-weight: normal;
   padding: 10px 20px;
   background-color: rgb(250, 250, 250);
-  margin-left: -20px;
-  margin-right: -20px;
 }
 h4{
   font-weight: normal;
   border-bottom: solid 1px #3f51b5;
+}
+#photos-wrapper *{
+  max-width: 100%;
 }
 .flex{
   display: flex;

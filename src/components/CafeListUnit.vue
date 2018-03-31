@@ -14,6 +14,7 @@
     </div>
     <div>{{ cafe.address }}</div>
     <div class="inner-info">
+      <div>{{ opening }}</div>
       <div>{{ cafe.formatted_phone_number }}</div>
       <div>{{ cafe.email }}</div>
       <div class="flex">
@@ -50,6 +51,18 @@ export default {
   data () {
     return {
       distance: null
+    }
+  },
+  computed: {
+    opening: function () {
+      if (!this.cafe || !this.cafe.opening_hours || !this.cafe.opening_hours.weekday_text) return '';
+      const day = new Date().getDay();
+      const weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+      for (var i = 0; i < this.cafe.opening_hours.weekday_text.length; i++) {
+        if (this.cafe.opening_hours.weekday_text[i].includes(weekdays[day])) {
+          return this.cafe.opening_hours.weekday_text[i].replace((weekdays[day] + ':'), '').trim();
+        }
+      }
     }
   },
   methods: {

@@ -49,7 +49,5 @@ export default {
   #center-wrap{
     margin-left: auto;
     margin-right: auto;
-    width: 400px;
-    max-width: 95%;
   }
 </style>
